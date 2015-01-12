@@ -47,6 +47,20 @@ open_file(char *s, int i)
 	return fp;
 }
 
+// Help function
+void
+help(void)
+{
+	printf("\nThis program is designed to encrypt/decrypt files.\n");
+	printf("\nOptions:\n");
+	printf("\t--help(-h) - reference manual\n");
+	printf("\t--type(-t) - type running of program: 1 - encrypt, 2 - decrypt\n");
+	printf("\t--block(-b) - block size data read from the file. By default = 10000\n");
+	printf("\t--input(-i) - input file\n");
+	printf("\t--output(-o) - output file\n");
+	printf("Example: ./bigtest -t 1 -b 1000 -i 1.txt -o crypt or ./bigtest -t 2 -b 1000 -i crypt -o decrypt\n\n");
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -54,21 +68,24 @@ main(int argc, char *argv[])
 	struct hc128_context *ctx;
 	uint32_t byte, block = 10000;
 	uint8_t *buf, *out, key[16], iv[16];
-	char *file1, *file2;
+	char file1[MAX_FILE], file2[MAX_FILE];
 	int res, action = 1;
 
-	file1 = xmalloc(sizeof(char) * MAX_FILE);
-	file2 = xmalloc(sizeof(char) * MAX_FILE);
-	
 	const struct option long_option [] = {
 		{"input",  1, NULL, 'i'},
 		{"output", 1, NULL, 'o'},
 		{"block",  1, NULL, 'b'},
 		{"type",   1, NULL, 't'},
+		{"help",   0, NULL, 'h'},
 		{0, 	   0, NULL,  0 }
 	};
 	
-	while((res = getopt_long(argc, argv, "i:o:b:t:", long_option, 0)) != -1) {
+	if(argc < 2) {
+		help();
+		return 0;
+	}
+
+	while((res = getopt_long(argc, argv, "i:o:b:t:h", long_option, 0)) != -1) {
 		switch(res) {
 		case 'b' : block = atoi(optarg);
 			   break;
@@ -78,6 +95,8 @@ main(int argc, char *argv[])
 			   break;
 		case 't' : action = atoi(optarg);
 			   break;
+		case 'h' : help();
+			   return 0;
 		}
 	}
 	
@@ -110,10 +129,9 @@ main(int argc, char *argv[])
 	}
 	
 	hc128_context_free(&ctx);
+	
 	free(buf);
 	free(out);
-	free(file1);
-	free(file2);
 
 	return 0;
 }
