@@ -5,8 +5,8 @@ SOURCES=./hc128_sources
 MAIN_OBJS=hc128.o main.o
 BIGTEST_OBJS=hc128.o bigtest.o
 
-MAIN_DEVELOPER_OBJS=$(SOURCES)/hc-128.o $(SOURCES)/main.o
-BIGTEST_DEVELOPER_OBJS=$(SOURCES)/hc-128.o $(SOURCES)/bigtest_2.o
+MAIN_DEVELOPER_OBJS=$(patsubst %, $(SOURCES)/%, hc-128.o main.o)
+BIGTEST_DEVELOPER_OBJS=$(patsubst %, $(SOURCES)/%, hc-128.o bigtest_2.o)
 
 MAIN=main
 BIGTEST=bigtest
