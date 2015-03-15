@@ -57,14 +57,14 @@ main(void)
 		exit(1);
 	}
 
-	if(hc128_set_key_and_iv(ctx, (uint8_t *)key, 16, iv)) {
+	if(hc128_set_key_and_iv(ctx, (uint8_t *)key, 16, iv, 16)) {
 		printf("HC128 context filling error!\n");
 		exit(1);
 	}
 	
 	hc128_encrypt(ctx, buf, BUFLEN, out1);
 	
-	if(hc128_set_key_and_iv(ctx, (uint8_t *)key, 16, iv)) {
+	if(hc128_set_key_and_iv(ctx, (uint8_t *)key, 16, iv, 16)) {
 		printf("HC128 context filling error!\n");
 		exit(1);
 	}

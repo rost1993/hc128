@@ -17,7 +17,7 @@
 
 #include "hc128.h"
 
-#define HC128		128
+#define HC128		16
 
 #define ROTL32(v, n)	((v << n) | (v >> (32 - n)))
 #define ROTR32(v, n)	((v >> n) | (v << (32 - n)))
@@ -102,7 +102,8 @@
 
 /* 
  * HC128 context
- * keylen - chiper key length
+ * keylen - chiper key length in bytes
+ * ivlen - vector initialization length in bytes
  * key - chiper key
  * iv - initialization vector
  * w - array with 1024 32-bit elements
@@ -112,6 +113,7 @@
 */
 struct hc128_context {
 	int keylen;
+	int ivlen;
 	uint8_t key[16];
 	uint8_t iv[16];
 	uint32_t w[1024];
@@ -125,7 +127,7 @@ struct hc128_context *
 hc128_context_new(void)
 {
 	struct hc128_context *ctx;
-	ctx = malloc(sizeof(*ctx));
+	ctx = (struct hc128_context *)malloc(sizeof(*ctx));
 
 	if(ctx == NULL)
 		return NULL;
@@ -205,6 +207,9 @@ hc128_initialization_process(struct hc128_context *ctx)
 		ctx->w[i] = U8TO32_LITTLE(ctx->key + (i * 4) % 16);
 		ctx->w[i + 8] = U8TO32_LITTLE(ctx->iv + (i * 4) % 16);
 	}
+
+	for(i = 0; i < (ctx->keylen >> 5); i++)
+		ctx->w[i] = U8TO32_LITTLE(ctx->key + (i * 4));
 	
 	for(i = 16; i < (256 + 16); i++)
 		ctx->w[i] = F2(ctx->w[i-2]) + ctx->w[i-7] + F1(ctx->w[i-15]) + ctx->w[i-16] + i;
@@ -226,15 +231,20 @@ hc128_initialization_process(struct hc128_context *ctx)
 // Fill the HC128 context (key and iv)
 // Return value: 0 (if all is well), -1 id all bad
 int
-hc128_set_key_and_iv(struct hc128_context *ctx, const uint8_t *key, const int keylen, const uint8_t iv[16])
+hc128_set_key_and_iv(struct hc128_context *ctx, const uint8_t *key, const int keylen, const uint8_t iv[16], const int ivlen)
 {
 	if(keylen <= HC128)
 		ctx->keylen = keylen;
 	else
 		return -1;
 	
-	memcpy(ctx->key, key, keylen);
-	memcpy(ctx->iv, iv, 16);
+	if((ivlen > 0) && (ivlen <= 16))
+		ctx->ivlen = ivlen;
+	else
+		return -1;
+	
+	memcpy(ctx->key, key, ctx->keylen);
+	memcpy(ctx->iv, iv, ctx->ivlen);
 	ctx->counter = 0;
 
 	hc128_initialization_process(ctx);
@@ -300,7 +310,7 @@ void
 hc128_encrypt(struct hc128_context *ctx, const uint8_t *buf, uint32_t buflen, uint8_t *out)
 {
 	uint32_t keystream[16];
-	int i;
+	uint32_t i;
 
 	for(; buflen >= 64; buflen -= 64, buf += 64, out += 64) {
 		hc128_generate_keystream(ctx, keystream);

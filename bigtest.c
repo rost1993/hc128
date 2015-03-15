@@ -114,7 +114,7 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 
-	if(hc128_set_key_and_iv(ctx, (uint8_t *)key, 32, iv)) {
+	if(hc128_set_key_and_iv(ctx, (uint8_t *)key, 32, iv, 16)) {
 		printf("Salsa context filling error!\n");
 		exit(1);
 	}
