@@ -24,7 +24,7 @@ main(void)
 		exit(1);
 	}
 	
-	if(hc128_set_key_and_iv(ctx, (uint8_t *)key1, 16, iv1)) {
+	if(hc128_set_key_and_iv(ctx, (uint8_t *)key1, 16, iv1, 16)) {
 		printf("HC128 context filling error!\n");
 		exit(1);
 	}
