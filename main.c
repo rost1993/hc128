@@ -8,7 +8,7 @@
 
 #include "hc128.h"
 
-#define BUFLEN 10000000
+#define BUFLEN 100000000
 
 // Struct for time value
 struct timeval t1, t2;
@@ -44,7 +44,7 @@ time_stop(void)
 int
 main(void)
 {
-	struct hc128_context *ctx;
+	struct hc128_context ctx;
 
 	memset(buf, 'q', sizeof(buf));
 	memset(key, 'k', sizeof(key));
@@ -52,27 +52,24 @@ main(void)
 	
 	time_start();
 
-	if((ctx = hc128_context_new()) == NULL) {
-		printf("Memory allocation error!\n");
-		exit(1);
-	}
+	hc128_init(&ctx);
 
-	if(hc128_set_key_and_iv(ctx, (uint8_t *)key, 16, iv, 16)) {
+	if(hc128_set_key_and_iv(&ctx, (uint8_t *)key, 16, iv, 16)) {
 		printf("HC128 context filling error!\n");
 		exit(1);
 	}
 	
-	hc128_encrypt(ctx, buf, BUFLEN, out1);
+	hc128_encrypt(&ctx, buf, BUFLEN, out1);
 	
-	if(hc128_set_key_and_iv(ctx, (uint8_t *)key, 16, iv, 16)) {
+	hc128_init(&ctx);
+
+	if(hc128_set_key_and_iv(&ctx, (uint8_t *)key, 16, iv, 16)) {
 		printf("HC128 context filling error!\n");
 		exit(1);
 	}
 	
-	hc128_decrypt(ctx, out1, BUFLEN, out2);
+	hc128_decrypt(&ctx, out1, BUFLEN, out2);
 	
-	hc128_context_free(&ctx);
-
 	printf("Run time = %d\n\n", time_stop());
 
 	return 0;

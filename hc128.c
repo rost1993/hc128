@@ -100,49 +100,11 @@
 	res = U32TO32((res2 ^ ctx->w[512+a]));			\
 }
 
-/* 
- * HC128 context
- * keylen - chiper key length in bytes
- * ivlen - vector initialization length in bytes
- * key - chiper key
- * iv - initialization vector
- * w - array with 1024 32-bit elements
- * x - array with 16 32-bit elements (for intermediate calculations)
- * y - array with 16 32-bit elements (for intermediate calculations)
- * counter - the counter system
-*/
-struct hc128_context {
-	int keylen;
-	int ivlen;
-	uint8_t key[16];
-	uint8_t iv[16];
-	uint32_t w[1024];
-	uint32_t x[16];
-	uint32_t y[16];
-	uint32_t counter;
-};
-
-// Allocates memory for the HC128 context
-struct hc128_context *
-hc128_context_new(void)
-{
-	struct hc128_context *ctx;
-	ctx = (struct hc128_context *)malloc(sizeof(*ctx));
-
-	if(ctx == NULL)
-		return NULL;
-	
-	memset(ctx, 0, sizeof(*ctx));
-
-	return ctx;
-}
-
-// Delete HC128 context
+// HC128 initialization function
 void
-hc128_context_free(struct hc128_context **ctx)
+hc128_init(struct hc128_context *ctx)
 {
-	free(*ctx);
-	*ctx = NULL;
+	memset(ctx, 0, sizeof(*ctx));
 }
 
 // Function update array w[1024]

@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -O2
+CFLAGS=-Wall -O3
 SOURCES=./hc128_sources
 
 MAIN_OBJS=hc128.o main.o
