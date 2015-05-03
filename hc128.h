@@ -29,12 +29,9 @@ struct hc128_context {
 	uint32_t counter;
 };
 
-void hc128_init(struct hc128_context *ctx);
-
 int hc128_set_key_and_iv(struct hc128_context *ctx, const uint8_t *key, const int keylen, const uint8_t iv[16], const int ivlen);
 
-void hc128_encrypt(struct hc128_context *ctx, const uint8_t *buf, uint32_t buflen, uint8_t *out);
-void hc128_decrypt(struct hc128_context *ctx, const uint8_t *buf, uint32_t buflen, uint8_t *out);
+void hc128_crypt(struct hc128_context *ctx, const uint8_t *buf, uint32_t buflen, uint8_t *out);
 
 void hc128_test_vectors(struct hc128_context *ctx);
 

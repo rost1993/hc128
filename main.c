@@ -8,7 +8,7 @@
 
 #include "hc128.h"
 
-#define BUFLEN 100000000
+#define BUFLEN 10000000
 
 // Struct for time value
 struct timeval t1, t2;
@@ -52,23 +52,19 @@ main(void)
 	
 	time_start();
 
-	hc128_init(&ctx);
-
 	if(hc128_set_key_and_iv(&ctx, (uint8_t *)key, 16, iv, 16)) {
 		printf("HC128 context filling error!\n");
 		exit(1);
 	}
 	
-	hc128_encrypt(&ctx, buf, BUFLEN, out1);
+	hc128_crypt(&ctx, buf, BUFLEN, out1);
 	
-	hc128_init(&ctx);
-
 	if(hc128_set_key_and_iv(&ctx, (uint8_t *)key, 16, iv, 16)) {
 		printf("HC128 context filling error!\n");
 		exit(1);
 	}
 	
-	hc128_decrypt(&ctx, out1, BUFLEN, out2);
+	hc128_crypt(&ctx, out1, BUFLEN, out2);
 	
 	printf("Run time = %d\n\n", time_stop());
 

@@ -101,7 +101,7 @@
 }
 
 // HC128 initialization function
-void
+static void
 hc128_init(struct hc128_context *ctx)
 {
 	memset(ctx, 0, sizeof(*ctx));
@@ -195,6 +195,8 @@ hc128_initialization_process(struct hc128_context *ctx)
 int
 hc128_set_key_and_iv(struct hc128_context *ctx, const uint8_t *key, const int keylen, const uint8_t iv[16], const int ivlen)
 {
+	hc128_init(ctx);
+
 	if(keylen <= HC128)
 		ctx->keylen = keylen;
 	else
@@ -262,14 +264,14 @@ hc128_generate_keystream(struct hc128_context *ctx, uint32_t *keystream)
 }
 
 /*
- * HC128 encrypt algorithm.
+ * HC128 crypt algorithm.
  * ctx - pointer on HC128 context
  * buf - pointer on buffer data
  * buflen - length the data buffer
  * out - pointer on output array
 */
 void
-hc128_encrypt(struct hc128_context *ctx, const uint8_t *buf, uint32_t buflen, uint8_t *out)
+hc128_crypt(struct hc128_context *ctx, const uint8_t *buf, uint32_t buflen, uint8_t *out)
 {
 	uint32_t keystream[16];
 	uint32_t i;
@@ -302,14 +304,6 @@ hc128_encrypt(struct hc128_context *ctx, const uint8_t *buf, uint32_t buflen, ui
 			out[i] = buf[i] ^ ((uint8_t *)keystream)[i];
 	}
 }
-
-// HC128 decrypt function. See hc128_encrypt
-void
-hc128_decrypt(struct hc128_context *ctx, const uint8_t *buf, uint32_t buflen, uint8_t *out)
-{
-	hc128_encrypt(ctx, buf, buflen, out);
-}
-
 
 #if __BYTE_ORDER == __BIG_ENDIAN
 #define PRINT_U32TO32(x) \
